@@ -61,11 +61,12 @@ module.exports = function(env) {
       var url;
       url = install_data.repository;
       return rimraf(temp_location, function(err) {
-        var command;
+        var command, pullCommand;
         if (err) {
           return callback(err);
         }
         command = 'cd ' + temp_location + '; git clone ' + url + ' ' + temp_location;
+        pullCommand = 'cd ' + temp_location + '; git pull';
         env.debug("Cloning " + url.red);
         return fs.mkdir(temp_location, function(err) {
           if (err) {
@@ -75,26 +76,32 @@ module.exports = function(env) {
             if (error) {
               return callback(error);
             }
-            return env.plugins.git(temp_pluginname).then(function(plugin_git) {
-              if (version_mask) {
-                return plugin_git.getLatestVersion(version_mask).then(function(latest) {
-                  if (latest) {
-                    command = 'cd ' + temp_location + '; git checkout ' + latest;
-                    return exec(command, function(error, stdout, stderr) {
-                      if (error) {
-                        return callback(error);
-                      }
-                      return callback(null);
-                    });
-                  } else {
-                    return callback(null);
-                  }
-                });
-              } else {
-                return callback(null);
+            env.debug("Pulling");
+            return exec(pullCommand, function(error, stdout, stderr) {
+              if (error) {
+                return callback(error);
               }
-            }).fail(function(err) {
-              return callback(null);
+              return env.plugins.git(temp_pluginname).then(function(plugin_git) {
+                if (version_mask) {
+                  return plugin_git.getLatestVersion(version_mask).then(function(latest) {
+                    if (latest) {
+                      command = 'cd ' + temp_location + '; git checkout ' + latest;
+                      return exec(command, function(error, stdout, stderr) {
+                        if (error) {
+                          return callback(error);
+                        }
+                        return callback(null);
+                      });
+                    } else {
+                      return callback(null);
+                    }
+                  });
+                } else {
+                  return callback(null);
+                }
+              }).fail(function(err) {
+                return callback(null);
+              });
             });
           });
         });

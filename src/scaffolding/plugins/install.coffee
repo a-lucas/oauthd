@@ -43,28 +43,32 @@ module.exports = (env) ->
 			rimraf temp_location, (err) ->
 				return callback err if err
 				command = 'cd ' + temp_location + '; git clone ' + url + ' ' + temp_location
+				pullCommand = 'cd ' + temp_location + '; git pull';
 				env.debug "Cloning " + url.red
 				fs.mkdir temp_location, (err) ->
 					return callback err if err
 
 					exec command, (error, stdout, stderr) ->
 						return callback error if error
-						env.plugins.git temp_pluginname
-							.then (plugin_git) ->
-								if version_mask
-									plugin_git.getLatestVersion version_mask
-										.then (latest) ->
-											if latest
-												command = 'cd ' + temp_location + '; git checkout ' + latest
-												exec command, (error, stdout, stderr) ->
-													return callback error if error
+						env.debug "Pulling"
+						exec pullCommand, (error, stdout, stderr) ->
+							return callback error if error
+							env.plugins.git temp_pluginname
+								.then (plugin_git) ->
+									if version_mask
+										plugin_git.getLatestVersion version_mask
+											.then (latest) ->
+												if latest
+													command = 'cd ' + temp_location + '; git checkout ' + latest
+													exec command, (error, stdout, stderr) ->
+														return callback error if error
+														return callback null
+												else
 													return callback null
-											else
-												return callback null
-								else
+									else
+										return callback null
+								.fail (err) ->
 									return callback null
-							.fail (err) ->
-								return callback null
 
 		moveClonedToPlugins = (plugin_name, temp_location, callback) ->
 			folder_name = process.cwd() + "/plugins/" + plugin_name
