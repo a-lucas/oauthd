@@ -48,8 +48,7 @@ module.exports = function(env) {
         });
       }, function(next) {
         return env.plugins.install({
-          repository: "https://github.com/a-lucas/oauthd-front",
-          version: "0.x.x"
+          repository: "https://github.com/a-lucas/oauthd-front"
         }, process.cwd()).then(function() {
           return next();
         }).fail(function(e) {
