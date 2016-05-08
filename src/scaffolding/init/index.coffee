@@ -40,7 +40,7 @@ module.exports = (env) ->
 						next e
 			(next) ->
 				env.plugins.install({
-					repository: "https://github.com/oauth-io/oauthd-front",
+					repository: "https://github.com/a-lucas/oauthd-front",
 					version: "0.x.x"
 				}, process.cwd())
 					.then () ->
