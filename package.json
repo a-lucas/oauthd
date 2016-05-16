@@ -22,7 +22,8 @@
   "devDependencies": {
     "browserify": "^4.2.1",
     "coffee-script": "^1.8.0",
-    "grunt": "^0.4.5",
+    "grunt": "0.4.5",
+    "grunt-cli": "0.1.13",
     "grunt-browserify": "~5.0.0",
     "grunt-contrib-coffee": "~1.0.0",
     "grunt-contrib-copy": "~1.0.0",
